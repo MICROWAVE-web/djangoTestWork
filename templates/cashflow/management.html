@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+
+{% block title %}Управление справочниками - Управление ДДС{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1><i class="bi bi-gear"></i> Управление справочниками</h1>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-3 mb-4">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <i class="bi bi-tag display-1 text-primary"></i>
+                <h5 class="card-title mt-3">Статусы</h5>
+                <p class="card-text">Управление статусами записей (Бизнес, Личное, Налог)</p>
+                <a href="{% url 'cashflow:status_list' %}" class="btn btn-primary">
+                    <i class="bi bi-list"></i> Перейти к статусам
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-4">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <i class="bi bi-arrow-up-down display-1 text-success"></i>
+                <h5 class="card-title mt-3">Типы</h5>
+                <p class="card-text">Управление типами операций (Пополнение, Списание)</p>
+                <a href="{% url 'cashflow:type_list' %}" class="btn btn-success">
+                    <i class="bi bi-list"></i> Перейти к типам
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-4">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <i class="bi bi-folder display-1 text-info"></i>
+                <h5 class="card-title mt-3">Категории</h5>
+                <p class="card-text">Управление категориями операций</p>
+                <a href="{% url 'cashflow:category_list' %}" class="btn btn-info">
+                    <i class="bi bi-list"></i> Перейти к категориям
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-4">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <i class="bi bi-folder2 display-1 text-warning"></i>
+                <h5 class="card-title mt-3">Подкатегории</h5>
+                <p class="card-text">Управление подкатегориями операций</p>
+                <a href="{% url 'cashflow:subcategory_list' %}" class="btn btn-warning">
+                    <i class="bi bi-list"></i> Перейти к подкатегориям
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-info-circle"></i> Информация о справочниках</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Логические зависимости:</h6>
+                        <ul>
+                            <li>Подкатегории привязаны к категориям</li>
+                            <li>Категории привязаны к типам</li>
+                            <li>При выборе типа фильтруются доступные категории</li>
+                            <li>При выборе категории фильтруются доступные подкатегории</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Рекомендации:</h6>
+                        <ul>
+                            <li>Сначала создайте типы операций</li>
+                            <li>Затем создайте категории для каждого типа</li>
+                            <li>После этого создайте подкатегории для каждой категории</li>
+                            <li>Наконец, создайте статусы</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block title %}Удаление записи - Управление ДДС{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-danger text-white">
+                <h4 class="mb-0"><i class="bi bi-exclamation-triangle"></i> Подтверждение удаления</h4>
+            </div>
+            <div class="card-body">
+                <p>Вы уверены, что хотите удалить эту запись?</p>
+                
+                <div class="alert alert-warning">
+                    <strong>Информация о записи:</strong><br>
+                    <strong>Дата:</strong> {{ cashflow.date|date:"d.m.Y" }}<br>
+                    <strong>Статус:</strong> {{ cashflow.status.name }}<br>
+                    <strong>Тип:</strong> {{ cashflow.type.name }}<br>
+                    <strong>Категория:</strong> {{ cashflow.category.name }}<br>
+                    <strong>Подкатегория:</strong> {{ cashflow.subcategory.name }}<br>
+                    <strong>Сумма:</strong> 
+                    {% if cashflow.type.name == "Пополнение" %}
+                        <span class="text-success">+{{ cashflow.amount|floatformat:2 }} ₽</span>
+                    {% else %}
+                        <span class="text-danger">-{{ cashflow.amount|floatformat:2 }} ₽</span>
+                    {% endif %}
+                    {% if cashflow.comment %}
+                        <br><strong>Комментарий:</strong> {{ cashflow.comment }}
+                    {% endif %}
+                </div>
+                
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'cashflow:home' %}" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left"></i> Отмена
+                        </a>
+                        <button type="submit" class="btn btn-danger">
+                            <i class="bi bi-trash"></i> Удалить
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
