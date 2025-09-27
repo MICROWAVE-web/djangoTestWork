@@ -10,6 +10,9 @@
 - ✅ Управление справочниками (статусы, типы, категории, подкатегории)
 - ✅ Логические зависимости между сущностями
 - ✅ Валидация данных на стороне клиента и сервера
+- ✅ **Полноценный RESTful API** с аутентификацией и правами доступа
+- ✅ **Статистика и аналитика** денежных потоков
+- ✅ **Поиск и фильтрация** через API
 
 ### Поля записей ДДС
 - **Дата** - автоматически заполняется текущей датой, но может быть изменена
@@ -28,9 +31,12 @@
 ## Технологии
 
 - **Backend**: Python 3.x, Django 5.2.6
+- **API**: Django REST Framework 3.15.2
 - **База данных**: SQLite (по умолчанию)
 - **Frontend**: HTML, CSS (Bootstrap 5.3), JavaScript (jQuery)
 - **Иконки**: Bootstrap Icons
+- **Аутентификация**: Token Authentication, Session Authentication
+- **CORS**: django-cors-headers для кросс-доменных запросов
 
 ## Установка и запуск
 
@@ -80,7 +86,12 @@ djangoTestWork/
 │   ├── views.py            # Представления
 │   ├── forms.py            # Формы
 │   ├── admin.py            # Административный интерфейс
-│   └── urls.py             # URL-маршруты
+│   ├── urls.py             # URL-маршруты
+│   ├── api_views.py        # API представления (ViewSets)
+│   ├── api_urls.py         # API URL-маршруты
+│   ├── serializers.py      # API сериализаторы
+│   ├── permissions.py     # API права доступа
+│   └── api_docs.py        # API документация
 ├── templates/              # HTML шаблоны
 │   ├── base.html
 │   └── cashflow/
@@ -139,9 +150,97 @@ djangoTestWork/
 - Использование Bootstrap 5 для создания адаптивного интерфейса
 - Мобильная версия поддерживается
 
-## API Endpoints
+## RESTful API
 
-### AJAX endpoints
+### Аутентификация
+
+API поддерживает два типа аутентификации:
+- **Session Authentication** - для веб-интерфейса
+- **Token Authentication** - для мобильных приложений и внешних клиентов
+
+Для получения токена:
+```bash
+curl -X POST http://127.0.0.1:8000/api/v1/auth/token/ \
+  -H "Content-Type: application/json" \
+  -d '{"username": "your_username", "password": "your_password"}'
+```
+
+### Основные API Endpoints
+
+#### Статусы
+- `GET /api/v1/statuses/` - список всех статусов
+- `POST /api/v1/statuses/` - создание нового статуса
+- `GET /api/v1/statuses/{id}/` - получение статуса по ID
+- `PUT /api/v1/statuses/{id}/` - обновление статуса
+- `DELETE /api/v1/statuses/{id}/` - удаление статуса
+
+#### Типы
+- `GET /api/v1/types/` - список всех типов
+- `POST /api/v1/types/` - создание нового типа
+- `GET /api/v1/types/{id}/` - получение типа по ID
+- `PUT /api/v1/types/{id}/` - обновление типа
+- `DELETE /api/v1/types/{id}/` - удаление типа
+
+#### Категории
+- `GET /api/v1/categories/` - список всех категорий
+- `POST /api/v1/categories/` - создание новой категории
+- `GET /api/v1/categories/{id}/` - получение категории по ID
+- `PUT /api/v1/categories/{id}/` - обновление категории
+- `DELETE /api/v1/categories/{id}/` - удаление категории
+- `GET /api/v1/categories/by-type/?type_id={id}` - категории по типу
+
+#### Подкатегории
+- `GET /api/v1/subcategories/` - список всех подкатегорий
+- `POST /api/v1/subcategories/` - создание новой подкатегории
+- `GET /api/v1/subcategories/{id}/` - получение подкатегории по ID
+- `PUT /api/v1/subcategories/{id}/` - обновление подкатегории
+- `DELETE /api/v1/subcategories/{id}/` - удаление подкатегории
+- `GET /api/v1/subcategories/by-category/?category_id={id}` - подкатегории по категории
+
+#### Денежные потоки
+- `GET /api/v1/cashflows/` - список всех записей денежных потоков
+- `POST /api/v1/cashflows/` - создание новой записи
+- `GET /api/v1/cashflows/{id}/` - получение записи по ID
+- `PUT /api/v1/cashflows/{id}/` - обновление записи
+- `DELETE /api/v1/cashflows/{id}/` - удаление записи
+
+#### Дополнительные endpoints
+- `GET /api/v1/cashflows/statistics/` - статистика по денежным потокам
+- `GET /api/v1/cashflows/monthly-summary/` - месячная сводка
+- `GET /api/v1/cashflows/recent/` - последние записи
+- `GET /api/v1/cashflows/search/` - поиск по записям
+
+### Примеры использования API
+
+#### Получение списка денежных потоков с фильтрацией:
+```bash
+curl -H "Authorization: Token your_token_here" \
+  "http://127.0.0.1:8000/api/v1/cashflows/?status=1&type=2&date__gte=2024-01-01&ordering=-date"
+```
+
+#### Создание новой записи:
+```bash
+curl -X POST http://127.0.0.1:8000/api/v1/cashflows/ \
+  -H "Authorization: Token your_token_here" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "date": "2024-01-15",
+    "status": 1,
+    "type": 2,
+    "category": 3,
+    "subcategory": 4,
+    "amount": "50000.00",
+    "comment": "Зарплата за январь"
+  }'
+```
+
+#### Получение статистики:
+```bash
+curl -H "Authorization: Token your_token_here" \
+  "http://127.0.0.1:8000/api/v1/cashflows/statistics/?date_from=2024-01-01&date_to=2024-01-31"
+```
+
+### AJAX endpoints (для веб-интерфейса)
 - `GET /ajax/get-categories/` - получение категорий по типу
 - `GET /ajax/get-subcategories/` - получение подкатегорий по категории
 
@@ -159,4 +258,31 @@ djangoTestWork/
 3. Создайте представления в `cashflow/views.py`
 4. Добавьте URL-маршруты в `cashflow/urls.py`
 5. Создайте шаблоны
+
+## Новые возможности API
+
+### Статистика и аналитика
+- **Общая статистика**: общая сумма, количество записей
+- **Статистика по типам**: доходы и расходы
+- **Статистика по статусам**: бизнес, личное, налоги
+- **Статистика по категориям**: детализация по категориям
+- **Месячная сводка**: статистика за конкретный месяц
+
+### Поиск и фильтрация
+- **Полнотекстовый поиск** по комментариям и названиям
+- **Фильтрация по датам** (от, до)
+- **Фильтрация по статусам, типам, категориям**
+- **Сортировка** по любому полю
+- **Пагинация** для больших объемов данных
+
+### Аутентификация и безопасность
+- **Token Authentication** для мобильных приложений
+- **Session Authentication** для веб-интерфейса
+- **Права доступа**: чтение для всех, запись для авторизованных
+- **CORS поддержка** для кросс-доменных запросов
+
+### Дополнительные endpoints
+- **Последние записи**: быстрый доступ к недавним операциям
+- **Расширенный поиск**: поиск по всем текстовым полям
+- **Связанные данные**: получение категорий по типу, подкатегорий по категории
 
